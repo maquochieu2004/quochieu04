@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        p {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>DFS: Tìm đường đi với chi phí tối thiểu</h2>
+
+<!-- Khi nhấn nút này, hàm findMinCostPath() sẽ được gọi -->
+<button onclick="findMinCostPath()">Tìm đường đi</button>
+
+<!-- Đồ thị sẽ được hiển thị ở đây -->
+<p id="graph"></p>
+<!-- Ma trận chi phí sẽ được hiển thị ở đây -->
+<p id="costs"></p>
+<!-- Kết quả sẽ được hiển thị ở đây -->
+<p id="result"></p>
+
+<script>
+class Stack {
+    constructor() {
+        this.items = [];
+    }
+
+    push(element) {
+        this.items.push(element);
+    }
+
+    pop() {
+        if (this.isEmpty()) return null;
+        return this.items.pop();
+    }
+
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}
+
+// Hàm này sẽ tìm đường đi từ đỉnh start đến đỉnh end với chi phí tối thiểu
+function dfsMinCostPath(graph, start, end, costs) {
+    let stack = new Stack();
+    let visited = new Array(graph.length).fill(false);
+    let minCost = { min: Infinity, path: [] };
+
+    stack.push({ vertex: start, path: [], cost: 0 });
+
+    while (!stack.isEmpty()) {
+        let { vertex, path, cost } = stack.pop();
+
+        visited[vertex] = true;
+        path.push(vertex);
+
+        if (vertex === end && cost < minCost.min) {
+            minCost.min = cost;
+            minCost.path = [...path];
+        }
+
+        for (let neighbor = graph.length - 1; neighbor >= 0; neighbor--) {
+            if (graph[vertex][neighbor] === 1 && !visited[neighbor]) {
+                stack.push({ vertex: neighbor, path: [...path], cost: cost + costs[vertex][neighbor] });
+            }
+        }
+    }
+
+    return minCost;
+}
+
+// Hàm này sẽ tìm và hiển thị đường đi với chi phí tối thiểu
+function findMinCostPath() {
+    let graph = [
+        [0, 1, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [0, 0, 0, 0]
+    ];
+
+    let costs = [
+        [0, 3, 11, Infinity],
+        [Infinity, 0, 7, Infinity],
+        [Infinity, Infinity, 0, 2],
+        [Infinity, Infinity, Infinity, 0]
+    ];
+
+    let startVertex = 0;
+    let endVertex = 3;
+
+    let minCost = dfsMinCostPath(graph, startVertex, endVertex, costs);
+
+    document.getElementById("graph").innerHTML = "Đồ thị: <br>" + graph.map(row => row.join(", ")).join("<br>");
+    document.getElementById("costs").innerHTML = "Chi phí: <br>" + costs.map(row => row.join(", ")).join("<br>");
+    document.getElementById("result").innerHTML = "Đường đi với chi phí tối thiểu: " + minCost.path.join(" -> ") + ", chi phí = " + minCost.min;
+}
+</script>
+
+</body>
+</html>
