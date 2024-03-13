@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <table id="matrix"></table>
+    <button onclick="displayMatrix()">Hiển thị ma trận</button>
+    <button onclick="kruskal()">Thực hiện thuật toán Kruskal</button>
+    <div id="result"></div>
+
+    <script>
+        var parent = [];
+        var rank = [];
+
+        function makeSet(v) {
+            parent[v] = v;
+            rank[v] = 0;
+        }
+
+        function find(v) {
+            if (v === parent[v]) {
+                return v;
+            }
+            return parent[v] = find(parent[v]);
+        }
+
+        function union(a, b) {
+            a = find(a);
+            b = find(b);
+            if (a !== b) {
+                if (rank[a] < rank[b]) {
+                    [a, b] = [b, a];
+                }
+                parent[b] = a;
+                if (rank[a] === rank[b]) {
+                    rank[a]++;
+                }
+            }
+        }
+
+        function displayMatrix() {
+            var matrix = [
+                [0, 4, 4, 0, 0],
+                [4, 0, 2, 3, 0],
+                [4, 2, 0, 5, 4],
+                [0, 3, 5, 0, 2],
+                [0, 0, 4, 2, 0]
+            ];
+            var table = document.getElementById("matrix");
+            table.innerHTML = "";
+            for (var i = 0; i < matrix.length; i++) {
+                var row = document.createElement("tr");
+                for (var j = 0; j < matrix[i].length; j++) {
+                    var cell = document.createElement("td");
+                    cell.textContent = matrix[i][j];
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+        }
+
+        function kruskal() {
+            var edges = [
+                {u: 0, v: 1, w: 4},
+                {u: 0, v: 2, w: 4},
+                {u: 1, v: 2, w: 2},
+                {u: 1, v: 3, w: 3},
+                {u: 2, v: 3, w: 5},
+                {u: 2, v: 4, w: 4},
+                {u: 3, v: 4, w: 2}
+            ];
+            var n = 5;
+            for (var i = 0; i < n; i++) {
+                makeSet(i);
+            }
+            edges.sort((a, b) => a.w - b.w);
+            var cost = 0;
+            for (var edge of edges) {
+                if (find(edge.u) !== find(edge.v)) {
+                    cost += edge.w;
+                    union(edge.u, edge.v);
+                }
+            }
+            document.getElementById("result").innerHTML = "Chi phí của cây khung nhỏ nhất: " + cost;
+        }
+    </script>
+</body>
+</html>
